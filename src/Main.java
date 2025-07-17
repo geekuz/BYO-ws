@@ -28,7 +28,8 @@ public class Main {
                 }
 
                 String command = parts[1];
-                String filePathStr = "src/"+parts[2];
+                String part = parts[2];
+                String filePathStr = "src/"+ part;
                 Path path = Paths.get(filePathStr);
 
                 if (!Files.exists(path)) {
@@ -42,16 +43,20 @@ public class Main {
                 try {
                     switch (command) {
                         case "-c":
-                            countBytes(path, fileNameForDisplay);
+                            long l = countBytes(path, fileNameForDisplay);
+                            System.out.println(l+" "+part);
                             break;
                         case "-l":
-                            countLines(path, fileNameForDisplay);
+                            long l1 = countLines(path, fileNameForDisplay);
+                            System.out.println(l1+" "+ part);
                             break;
                         case "-w":
-                            countWords(path, fileNameForDisplay);
+                            long l2 = countWords(path, fileNameForDisplay);
+                            System.out.println(l2);
                             break;
                         case "-m":
-                            countChars(path, fileNameForDisplay);
+                            int i = countChars(path, fileNameForDisplay);
+                            System.out.println(i);
                             break;
                         default:
                             System.err.println("Unknown command: " + command);
@@ -67,44 +72,46 @@ public class Main {
     /**
      * Counts the number of characters in a file. Corresponds to `wc -m`.
      */
-    private static void countChars(Path path, String fileName) throws IOException {
+    private static int countChars(Path path, String fileName) throws IOException {
         // This reads the entire file into a single string. It's simple and accurate for character
         // counting but can be memory-intensive for very large files.
         // For UTF-8 files with multibyte characters, this will be different from the byte count.
         String content = Files.readString(path);
-        System.out.println(content.length() + " " + fileName);
+        int length = content.length();
+        return length;
     }
 
     /**
      * Counts the number of words in a file. Corresponds to `wc -w`.
      */
-    private static void countWords(Path path, String fileName) throws IOException {
+    private static long countWords(Path path, String fileName) throws IOException {
         long wordCount;
         try (Stream<String> stream = Files.lines(path)) {
             wordCount = stream.flatMap(line -> Arrays.stream(line.trim().split("\\s+")))
                     .filter(word -> !word.isEmpty())
                     .count();
         }
-        System.out.println(wordCount + " " + fileName);
+        return wordCount;
     }
 
     /**
      * Counts the number of lines in a file. Corresponds to `wc -l`.
      */
-    private static void countLines(Path path, String fileName) throws IOException {
+    private static long countLines(Path path, String fileName) throws IOException {
         try {
             long lineCount = Files.lines(path).count();
-            System.out.println(lineCount + " " + fileName);
+            return lineCount;
         } catch (IOException e) {
             System.err.println("An error occurred while processing the file: " + e.getMessage());
         }
+        return 0L;
     }
 
     /**
      * Counts the number of bytes in a file. Corresponds to `wc -c`.
      */
-    private static void countBytes(Path path, String fileName) throws IOException {
+    private static long countBytes(Path path, String fileName) throws IOException {
         long byteCount = Files.size(path);
-        System.out.println(byteCount + " " + fileName);
+        return byteCount;
     }
 }
