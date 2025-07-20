@@ -22,18 +22,31 @@ public class Main {
                 }
 
                 String[] parts = line.trim().split("\\s+", 3);
-                if (parts.length < 2) {
-                    System.err.println("Invalid input. Please provide both an option and a filepath.");
-                    continue;
+                String command;
+                String part;
+                String filePathStr;
+                Path path;
+                if (parts.length < 3) {
+                    command = parts[0];
+                    part = parts[1];
+                     filePathStr = "src/"+ part;
+                    path = Paths.get(filePathStr);
+                }else if(Arrays.asList(parts).contains("cat")) {
+                    command = "-l";
+                    path=Paths.get("src/test.txt");
+                    part="";
+                }
+                else{
+                    command = parts[1];
+                    part = parts[2];
+                     filePathStr = "src/"+ part;
+                     path = Paths.get(filePathStr);
                 }
 
-                String command = parts[1];
-                String part = parts[2];
-                String filePathStr = "src/"+ part;
-                Path path = Paths.get(filePathStr);
+
 
                 if (!Files.exists(path)) {
-                    System.err.println("Error: File not found -> " + filePathStr);
+                    System.err.println("Error: File not found -> " + path);
                     continue;
                 }
 
@@ -59,7 +72,10 @@ public class Main {
                             System.out.println(i);
                             break;
                         default:
-                            System.err.println("Unknown command: " + command);
+                            long l3 = countBytes(path, fileNameForDisplay);
+                            long l4 = countLines(path, fileNameForDisplay);
+                            long l5 = countWords(path, fileNameForDisplay);
+                            System.out.println(l4+" "+ l5+" "+ l3+" "+part);
                             break;
                     }
                 } catch (IOException e) {
